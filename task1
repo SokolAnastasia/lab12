@@ -1,0 +1,92 @@
+import json
+
+# Функція для завантаження даних з JSON-файлу
+def load_data(file_name):
+    with open(file_name, 'r') as file:
+        data = json.load(file)
+    return data
+
+# Функція для збереження даних у JSON-файлі
+def save_data(file_name, data):
+    with open(file_name, 'w') as file:
+        json.dump(data, file, indent=4)
+
+# Функція для виведення на екран вмісту JSON-файлу
+def display_data(file_name):
+    data = load_data(file_name)
+    print(json.dumps(data, indent=4))
+
+# Функція для додавання нового запису у JSON-файл
+def add_record(file_name, record):
+    data = load_data(file_name)
+    data.append(record)
+    save_data(file_name, data)
+    print("Запис успішно додано.")
+
+# Функція для видалення запису з JSON-файлу
+def delete_record(file_name, index):
+    data = load_data(file_name)
+    if index < len(data):
+        del data[index]
+        save_data(file_name, data)
+        print("Запис успішно видалено.")
+    else:
+        print("Індекс виходить за межі діапазону.")
+
+# Функція для пошуку даних за полем "стать" у JSON-файлі
+def search_by_gender(file_name, gender):
+    data = load_data(file_name)
+    results = [person for person in data if person.get('стать') == gender]
+    if results:
+        print(f"Результати пошуку за статтею '{gender}':")
+        print(json.dumps(results, indent=4))
+    else:
+        print(f"Немає записів зі статтею '{gender}'.")
+
+# Функція для обчислення середнього зросту чоловіків
+def average_height_of_men(file_name):
+    data = load_data(file_name)
+    men_heights = [person.get('зріст') for person in data if person.get('стать') == 'чоловік']
+    if men_heights:
+        average_height = sum(men_heights) / len(men_heights)
+        return average_height
+    else:
+        return 0
+
+# Головна функція для взаємодії з користувачем
+def main():
+    file_name = "people_data.json"
+
+    while True:
+        print("\nМеню:")
+        print("1. Виведення на екран вмісту JSON файлу")
+        print("2. Додавання нового запису")
+        print("3. Видалення запису")
+        print("4. Пошук за статтю")
+        print("5. Обчислення середнього зросту чоловіків")
+        print("6. Вихід")
+
+        choice = input("Виберіть опцію: ")
+
+        if choice == '1':
+            display_data(file_name)
+        elif choice == '2':
+            new_record = json.loads(input("Введіть новий запис у форматі JSON: "))
+            add_record(file_name, new_record)
+        elif choice == '3':
+            index = int(input("Введіть індекс запису для видалення: "))
+            delete_record(file_name, index)
+        elif choice == '4':
+            gender = input("Введіть стать для пошуку: ")
+            search_by_gender(file_name, gender)
+        elif choice == '5':
+            avg_height = average_height_of_men(file_name)
+            print(f"Середній зріст чоловіків: {avg_height} см")
+        elif choice == '6':
+            print("Програма завершена.")
+            break
+        else:
+            print("Неправильний вибір. Спробуйте ще раз.")
+
+if __name__ == "__main__":
+    main()
